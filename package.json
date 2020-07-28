@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Adamman48/nodejs-mentoring#readme",
   "devDependencies": {
+    "@types/node": "^14.0.26",
     "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
