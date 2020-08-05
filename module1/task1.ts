@@ -1,8 +1,10 @@
 'use strict';
 
+// TODO: try refactor with pipeline or pipe
+
 process.stdin.setEncoding('utf-8');
 
-process.stdin.on('readable', () => {
+process.stdin.on('readable', (): void => {
   let chunk;
 
   while ((chunk = process.stdin.read()) !== null) {
