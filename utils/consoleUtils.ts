@@ -14,6 +14,5 @@ export function handleErrorCb(err: Error | null): void {
     console.error(ConsoleColorsEnum.RED, 'Operation failed.', err);
   } else {
     console.log(ConsoleColorsEnum.MAGENTA, 'Operation succeeded.');
-    displayMemoryUsage();
   }
 }

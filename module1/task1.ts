@@ -1,26 +1,31 @@
 'use strict';
-import { Transform } from 'stream';
+import { Transform, ReadableOptions, WritableOptions } from 'stream';
 import { handleErrorCb } from '../utils/consoleUtils';
+
+class TextTransformStream extends Transform {
+  constructor(options?: ReadableOptions | WritableOptions) {
+    super(options)
+  }
+
+  _transform(data: string, encoding: string, cb: Function): void {
+    let reversedString: string = data;
+    let errorText: Error | null = null;
+    try {
+      reversedString = reverseString(data);
+    } catch (err) {
+      errorText = new Error(`\n${err}`);
+    } finally {
+      cb(errorText, `${reversedString}\n\n`);
+    }
+  }
+};
 
 const { stdin, stdout } = process;
 
 stdin.setEncoding('utf-8');
 
-const textTransformStream = new Transform({
-  transform: (inputString, encoding, cb) => {
-    let reversedString;
-    let errorText: Error | null = null;
-    try {
-      reversedString = reverseString(inputString.toString());
-    } catch (err) {
-      errorText = new Error(`\n${err}`);
-    }
-    cb(errorText, `${reversedString}\n\n`);
-  }
-});
-
 stdin.on('error', handleErrorCb)
-  .pipe(textTransformStream).on('error', handleErrorCb)
+  .pipe(new TextTransformStream({ objectMode: true })).on('error', handleErrorCb)
   .pipe(stdout).on('error', handleErrorCb);
 
 function reverseString(inputString: string): string {
