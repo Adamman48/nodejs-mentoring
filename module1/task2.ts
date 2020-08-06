@@ -1,30 +1,24 @@
 'use strict';
 import csvtojson from "csvtojson";
 import fs from 'fs';
+import path from 'path';
 import { pipeline } from "stream";
+import { handleErrorCb } from "../utils/consoleUtils";
+import { ParserParamsInterface } from "../utils/definitions";
 
-const readStream = fs.createReadStream('./module1/csv/nodejs-hw1-ex1.csv');
-const writeStream = fs.createWriteStream('./module1/txt/nodejs-hw1-ex1.txt');
-
-const parserParams = {
+const parserParams: ParserParamsInterface = {
   delimiter: [';', ','],
   ignoreEmpty: true,
+  headers: ['book', 'author', 'amount', 'price'],
   ignoreColumns: /(amount)/,
   colParser: {
     "price": 'number',
   },
-  headers: ['book', 'author', 'amount', 'price']
 };
 
 pipeline(
-  readStream,
+  fs.createReadStream(path.join(__dirname, './csv/nodejs-hw1-ex1.csv')),
   csvtojson(parserParams),
-  writeStream,
-  (err: any) => {
-    if (err) {
-      console.error('Pipeline failed.', err);
-    } else {
-      console.log('Pipeline succeeded.');
-    }
-  }
+  fs.createWriteStream(path.join(__dirname, './txt/nodejs-hw1-ex1.txt')),
+  handleErrorCb,
 );

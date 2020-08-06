@@ -2,7 +2,7 @@
   "name": "nodejs-mentoring",
   "version": "1.0.0",
   "description": "This is my homework repository for NodeJs mentoring program",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "task1": "nodemon ./module1/task1",
     "task2": "nodemon ./module1/task2",

@@ -1,17 +1,27 @@
 'use strict';
+import { Transform } from 'stream';
+import { handleErrorCb } from '../utils/consoleUtils';
 
-// TODO: try refactor with pipeline or pipe
+const { stdin, stdout } = process;
 
-process.stdin.setEncoding('utf-8');
+stdin.setEncoding('utf-8');
 
-process.stdin.on('readable', (): void => {
-  let chunk;
-
-  while ((chunk = process.stdin.read()) !== null) {
-    chunk = reverseString(chunk);
-    process.stdout.write(`${chunk}\n\n`);
+const textTransformStream = new Transform({
+  transform: (inputString, encoding, cb) => {
+    let reversedString;
+    let errorText: Error | null = null;
+    try {
+      reversedString = reverseString(inputString.toString());
+    } catch (err) {
+      errorText = new Error(`\n${err}`);
+    }
+    cb(errorText, `${reversedString}\n\n`);
   }
 });
+
+stdin.on('error', handleErrorCb)
+  .pipe(textTransformStream).on('error', handleErrorCb)
+  .pipe(stdout).on('error', handleErrorCb);
 
 function reverseString(inputString: string): string {
   const splitString: string[] = inputString.split('');
