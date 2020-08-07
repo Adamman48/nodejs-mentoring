@@ -1,5 +1,5 @@
 {
   "watch": ["./"],
   "ext": "ts js",
-  "exec": "ts-node"
+  "exec": "tsc --noEmit && babel-node --extensions \".ts\""
 }
