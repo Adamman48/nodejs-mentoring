@@ -1,7 +1,7 @@
 'use strict';
 import csvtojson from "csvtojson";
-import fs from 'fs';
-import path from 'path';
+import { createReadStream, createWriteStream } from 'fs';
+import { join } from 'path';
 import { pipeline } from "stream";
 import { handleErrorCb, displayMemoryUsage } from "../utils/consoleUtils";
 import { ParserParamsInterface } from "../utils/definitions";
@@ -17,9 +17,9 @@ const parserParams: ParserParamsInterface = {
 };
 
 pipeline(
-  fs.createReadStream(path.join(__dirname, './csv/nodejs-hw1-ex1.csv')),
+  createReadStream(join(__dirname, './csv/nodejs-hw1-ex1.csv')),
   csvtojson(parserParams),
-  fs.createWriteStream(path.join(__dirname, './txt/nodejs-hw1-ex1.txt'))
+  createWriteStream(join(__dirname, './txt/nodejs-hw1-ex1.txt'))
     .on('finish', displayMemoryUsage),
   handleErrorCb,
 );
