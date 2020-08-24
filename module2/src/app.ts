@@ -2,6 +2,7 @@ import express from 'express';
 import { ConsoleColorsEnum } from '../../utils/consoleUtils';
 import { Controller } from './definitions/controller.abstract';
 import errorMiddleware from './middlewares/error.middleware';
+import validationErrorMiddleware from './middlewares/validationError.middleware';
 
 class App {
   public app: express.Application;
@@ -13,7 +14,7 @@ class App {
 
     this.initMiddlewares();
     this.initControllers(controllers);
-    this.initErrorMiddleware();
+    this.initErrorMiddlewares();
   }
 
   private initMiddlewares(): void {
@@ -26,7 +27,8 @@ class App {
     });
   }
 
-  private initErrorMiddleware() {
+  private initErrorMiddlewares() {
+    this.app.use(validationErrorMiddleware);
     this.app.use(errorMiddleware);
   }
 

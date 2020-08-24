@@ -8,10 +8,7 @@ function errorMiddleware(err: HttpException, req: Request, res: Response, next: 
 
   console.error(ConsoleColorsEnum.RED, err.stack);
   res.setHeader('content-type', 'text/html');
-  res
-    .status(status)
-    .send(message);
-
+  res.status(status).send(message);
 }
 
 export default errorMiddleware;

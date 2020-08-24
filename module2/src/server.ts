@@ -1,5 +1,5 @@
 import App from './app';
-import UsersController from './users/users.controller';
+import UsersController from './controllers/users.controller';
 
 const PORT = 3000;
 
