@@ -1,22 +1,12 @@
 import { Request, Response } from 'express';
 import User from './user.interface';
 import { Controller } from '../definitions/controller.abstract';
-import { v4 as uuidv4 } from 'uuid';
 import HttpException from '../exceptions/HttpException';
 import { ValidatedRequest } from 'express-joi-validation';
 import { usersValidator, headersSchema, paramSchema, UserRequestSchema, bodySchema } from '../validators/users.validator';
+import usersService from '../services/users.service';
 
 class UsersController extends Controller {
-  private users: User[] = [
-    {
-      id: 'testId',
-      login: 'test',
-      age: 30,
-      isDeleted: false,
-      password: 'password',
-    }
-  ];
-
   constructor() {
     super('/users');
   }
@@ -49,12 +39,13 @@ class UsersController extends Controller {
   }
 
   getAllUsers(req: Request, res: Response): void {
-    res.status(200).send(this.users);
+    const allUsers = usersService.findAll();
+    res.status(200).send(allUsers);
   }
 
   getUserById(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    const userData: User | undefined = this.users.find((user) => user.id === userId);
+    const userData: User | undefined = usersService.findOneById(userId);
 
     if (!userData) {
       throw new HttpException(404, 'User not found!');
@@ -65,49 +56,32 @@ class UsersController extends Controller {
   }
 
   addUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
-    const newUserData: User = { ...req.body, id: uuidv4(), isDeleted: false };
-    this.users.push(newUserData);
+    const newUserData: User = usersService.addOne(req.body);
     res.setHeader('content-type', 'application/json');
     res.status(200).send(newUserData);
   }
 
   updateUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    const { login, password, age } = req.body;
-
-    let updatedUserIndex = 0;
-    const userData: User | undefined = this.users.find((user: User, i: number) => {
-      if (user.id === userId) {
-        updatedUserIndex = i;
-      }
-      return user.id === userId;
-    });
+    const userData: User | undefined = usersService.updateOne(userId, req.body);
 
     if(!userData) {
       throw new HttpException(404, 'User not found!');
     } else {
-      this.users[updatedUserIndex] = { ...this.users[updatedUserIndex], login, password, age };
       res.setHeader('content-type', 'application/json');
-      res.status(200).send(this.users[updatedUserIndex]); 
+      res.status(200).send(userData); 
     }
   }
 
   softDeleteUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    let userIndex = 0;
-    const userData: User | undefined = this.users.find((user: User, i: number) => {
-      if(user.id === userId) {
-        userIndex = i;
-      }
-      return user.id === userId;
-    });
+    const userData: User | undefined = usersService.updateOne(userId, { isDeleted: true });
 
     if (!userData) {
       throw new HttpException(404, 'User not found!');
     } else {
-      this.users[userIndex].isDeleted = true;
       res.setHeader('content-type', 'application/json');
-      res.status(200).send(this.users[userIndex]);
+      res.status(200).send(userData);
     }
   }
 }
