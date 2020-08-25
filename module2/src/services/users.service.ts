@@ -49,14 +49,7 @@ class UsersService {
   }
 
   public autoSuggestUsers(loginSubstring: string, limit: number): User[] {
-    let suggestedUserLogins: User[] = this.users.reduce((accumulator: User[], user: User) => {
-      if(user.login && user.login.toLowerCase().includes(loginSubstring) && accumulator.length < limit) {
-        accumulator.push({ login: user.login });
-      }
-      return accumulator;
-    }, []);
-
-    suggestedUserLogins = suggestedUserLogins.sort((a: User, b: User): number => {
+    const usersAscendingByLogin: User[] = this.users.sort((a: User, b: User): number => {
       if (a.login && b.login) {
         const nameA = a.login.toLowerCase();
         const nameB = b.login.toLowerCase();
@@ -64,7 +57,14 @@ class UsersService {
         if (nameA > nameB) return 1;
       }
       return 0;
-     });
+    });
+
+    const suggestedUserLogins: User[] = usersAscendingByLogin.reduce((accumulator: User[], user: User) => {
+      if(user.login && user.login.toLowerCase().includes(loginSubstring) && accumulator.length < limit) {
+        accumulator.push({ login: user.login });
+      }
+      return accumulator;
+    }, []);
 
     return suggestedUserLogins;
   }
