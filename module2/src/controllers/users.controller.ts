@@ -3,7 +3,7 @@ import User from './user.interface';
 import { Controller } from '../definitions/controller.abstract';
 import HttpException from '../exceptions/HttpException';
 import { ValidatedRequest } from 'express-joi-validation';
-import { usersValidator, headersSchema, paramSchema, UserRequestSchema, bodySchema } from '../validators/users.validator';
+import { usersValidator, headersSchema, idParamSchema, UserRequestSchema, bodySchema, substringParamSchema, limitQuerySchema } from '../validators/users.validator';
 import usersService from '../services/users.service';
 
 class UsersController extends Controller {
@@ -15,7 +15,7 @@ class UsersController extends Controller {
     this.router.get(this.path, this.getAllUsers.bind(this));
     this.router.get(
       `${this.path}/:id`,
-      usersValidator.params(paramSchema),
+      usersValidator.params(idParamSchema),
       this.getUserById.bind(this)
     );
     this.router.post(
@@ -27,20 +27,26 @@ class UsersController extends Controller {
     this.router.put(
       `${this.path}/:id`,
       usersValidator.headers(headersSchema),
-      usersValidator.params(paramSchema),
+      usersValidator.params(idParamSchema),
       usersValidator.body(bodySchema),
       this.updateUser.bind(this)
     );
     this.router.delete(
       `${this.path}/:id`,
-      usersValidator.params(paramSchema),
+      usersValidator.params(idParamSchema),
       this.softDeleteUser.bind(this)
     );
+    this.router.get(
+      `${this.path}/suggest/:substr`,
+      usersValidator.params(substringParamSchema),
+      usersValidator.query(limitQuerySchema),
+      this.getAutoSuggestUsers.bind(this)
+    )
   }
 
   getAllUsers(req: Request, res: Response): void {
     const allUsers = usersService.findAll();
-    res.status(200).send(allUsers);
+    res.status(200).json(allUsers);
   }
 
   getUserById(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
@@ -51,14 +57,14 @@ class UsersController extends Controller {
       throw new HttpException(404, 'User not found!');
     } else {
       res.setHeader('content-type', 'application/json');
-      res.status(200).send(userData);
+      res.status(200).json(userData);
     }
   }
 
   addUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const newUserData: User = usersService.addOne(req.body);
     res.setHeader('content-type', 'application/json');
-    res.status(200).send(newUserData);
+    res.status(200).json(newUserData);
   }
 
   updateUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
@@ -69,7 +75,7 @@ class UsersController extends Controller {
       throw new HttpException(404, 'User not found!');
     } else {
       res.setHeader('content-type', 'application/json');
-      res.status(200).send(userData); 
+      res.status(200).json(userData); 
     }
   }
 
@@ -81,7 +87,22 @@ class UsersController extends Controller {
       throw new HttpException(404, 'User not found!');
     } else {
       res.setHeader('content-type', 'application/json');
-      res.status(200).send(userData);
+      res.status(200).json(userData);
+    }
+  }
+
+  getAutoSuggestUsers(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
+    const substring: string = req.params.substr;
+    const limit: number = req.query.limit;
+
+    const suggestedUserLogins: User[] = usersService.autoSuggestUsers(substring, limit);
+
+    if(!suggestedUserLogins.length) {
+      res.setHeader('content-type', 'text/html');
+      res.sendStatus(204);
+    } else {
+      res.setHeader('content-type', 'application/json');
+      res.status(200).json(suggestedUserLogins);
     }
   }
 }

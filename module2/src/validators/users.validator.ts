@@ -8,8 +8,16 @@ export const headersSchema: Joi.ObjectSchema = Joi.object({
   ['content-type']: Joi.equal('application/json').required(),
 });
 
-export const paramSchema: Joi.ObjectSchema = Joi.object({
+export const idParamSchema: Joi.ObjectSchema = Joi.object({
   id: Joi.string().required(),
+});
+
+export const substringParamSchema: Joi.ObjectSchema = Joi.object({
+  substr: Joi.string().required(),
+});
+
+export const limitQuerySchema: Joi.ObjectSchema = Joi.object({
+  limit: Joi.number().integer().max(5).required(),
 });
 
 export const bodySchema: Joi.ObjectSchema = Joi.object({
@@ -22,16 +30,13 @@ export const bodySchema: Joi.ObjectSchema = Joi.object({
 });
 
 export interface UserRequestSchema extends ValidatedRequestSchema {
-  /* [ContainerTypes.Headers]: {
-    ['content-type']: string,
-  }, */
   [ContainerTypes.Params]: {
     id: string,
+    substr: string,
   },
   [ContainerTypes.Body]: {
     login: string,
     password: string,
-    age: number,/* 
-    isDeleted: boolean, */
+    age: number,
   },
 };
