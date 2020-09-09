@@ -1,72 +1,47 @@
-import User from "../controllers/user.interface";
+import UserInterface from "../controllers/user.interface";
 import { v4 as uuidv4 } from 'uuid';
+import User from "../models/User.model";
+import { Op } from "sequelize";
 
 class UsersService {
-  private users: User[];
+  constructor() {}
 
-  constructor() {
-    this.users = [
-      {
-        id: 'testId',
-        login: 'test',
-        age: 30,
-        isDeleted: false,
-        password: 'password',
-      }
-    ];
-  }
-
-  public findAll(): User[] {
-    return this.users;
-  }
-
-  public findOneById(userId: string): User | undefined {
-    const userData: User | undefined = this.users.find((user) => user.id === userId);
-    return userData;
-  }
-
-  public addOne(userData: User): User {
-    const newUserData: User = { ...userData, id: uuidv4(), isDeleted: false };
-    this.users.push(newUserData);
-    return newUserData;
-  }
-
-  public updateOne(userId: string, dataToUpdate: User): User | undefined {
-    let updatedUserIndex = 0;
-    const userData = this.users.find((user: User, i: number) => {
-      if (user.id === userId) {
-        updatedUserIndex = i;
-      }
-      return user.id === userId;
+  public async findAll(): Promise<User[]>  {
+    return await User.findAll({
+      attributes: ['id', 'login', 'password', 'age'],
     });
-
-    if(!userData) {
-      return userData;
-    } else {
-      this.users[updatedUserIndex] = { ...this.users[updatedUserIndex], ...dataToUpdate };
-    }
-    return this.users[updatedUserIndex];
   }
 
-  public autoSuggestUsers(loginSubstring: string, limit: number): User[] {
-    const usersAscendingByLogin: User[] = this.users.sort((a: User, b: User): number => {
-      if (a.login && b.login) {
-        const nameA = a.login.toLowerCase();
-        const nameB = b.login.toLowerCase();
-        if (nameA < nameB) return -1;
-        if (nameA > nameB) return 1;
-      }
-      return 0;
+  public async findOneById(userId: string): Promise<User | null> {
+    return await User.findByPk(userId);
+  }
+
+  public async addOne(userData: UserInterface): Promise<User> {
+    return await User.create({ ...userData, id: uuidv4() });
+  }
+
+  public async updateOne(userId: string, dataToUpdate: UserInterface): Promise<[number, User[]]> {
+    return await User.update(dataToUpdate, {
+      where: {
+        id: userId,
+      },
+      returning: true,
     });
+  }
 
-    const suggestedUserLogins: User[] = usersAscendingByLogin.reduce((accumulator: User[], user: User) => {
-      if(user.login && user.login.toLowerCase().includes(loginSubstring) && accumulator.length < limit) {
-        accumulator.push({ login: user.login });
-      }
-      return accumulator;
-    }, []);
-
-    return suggestedUserLogins;
+  public async autoSuggestUsers(loginSubstring: string, limit: number): Promise<User[]> {
+    return await User.findAll({
+      attributes: ['login'],
+      order: [
+        ['login', 'ASC'],
+      ],
+      where: {
+        login: {
+          [Op.substring]: loginSubstring
+        }
+      },
+      limit: limit,
+    });
   }
 }
 

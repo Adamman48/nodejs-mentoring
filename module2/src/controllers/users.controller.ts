@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import User from './user.interface';
 import { Controller } from '../definitions/controller.abstract';
 import HttpException from '../exceptions/HttpException';
 import { ValidatedRequest } from 'express-joi-validation';
@@ -45,65 +44,84 @@ class UsersController extends Controller {
   }
 
   getAllUsers(req: Request, res: Response): void {
-    const allUsers = usersService.findAll();
-    res.status(200).json(allUsers);
+    usersService.findAll()
+      .then((result) => {
+        if (!result) {
+          throw new HttpException(404, 'No user found!');
+        } else {
+          res.status(200).json(result);
+        }
+      })
+      .catch((err) => res.status(err.status).send(err.message));
   }
 
   getUserById(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    const userData: User | undefined = usersService.findOneById(userId);
-
-    if (!userData) {
-      throw new HttpException(404, 'User not found!');
-    } else {
-      res.setHeader('content-type', 'application/json');
-      res.status(200).json(userData);
-    }
+    usersService.findOneById(userId)
+      .then((result) => {
+        if (!result) {
+          throw new HttpException(404, 'User not found!');
+        } else {
+          res.setHeader('content-type', 'application/json');
+          res.status(200).json(result);
+        }
+      })
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+      });
   }
 
   addUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
-    const newUserData: User = usersService.addOne(req.body);
-    res.setHeader('content-type', 'application/json');
-    res.status(200).json(newUserData);
+    usersService.addOne(req.body)
+      .then((result) => {
+        res.setHeader('content-type', 'application/json');
+        res.status(200).json(result);
+      })
+      .catch((err) => res.status(418).send(err));
   }
 
   updateUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    const userData: User | undefined = usersService.updateOne(userId, req.body);
-
-    if(!userData) {
-      throw new HttpException(404, 'User not found!');
-    } else {
-      res.setHeader('content-type', 'application/json');
-      res.status(200).json(userData); 
-    }
+    usersService.updateOne(userId, req.body)
+      .then((result) => {
+        if(!result[0]) {
+          throw new HttpException(404, 'User not found!');
+        }
+        res.setHeader('content-type', 'application/json');
+        res.status(200).json(result[1]);
+      })
+      .catch((err) => res.status(err.status).send(err.message));
   }
 
   softDeleteUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    const userData: User | undefined = usersService.updateOne(userId, { isDeleted: true });
-
-    if (!userData) {
-      throw new HttpException(404, 'User not found!');
-    } else {
-      res.setHeader('content-type', 'application/json');
-      res.status(200).json(userData);
-    }
+    usersService.updateOne(userId, { isDeleted: true })
+      .then((result) => {
+        if(!result[0]) {
+          throw new HttpException(404, 'User not found!');
+        }
+        res.setHeader('content-type', 'application/json');
+        res.status(200).json(result[1]);
+      })
+      .catch((err) => res.status(err.status).send(err.message));
   }
 
   getAutoSuggestUsers(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
     const substring: string = req.params.substr;
     const limit: number = req.query.limit;
 
-    const suggestedUserLogins: User[] = usersService.autoSuggestUsers(substring, limit);
-
-    if(!suggestedUserLogins.length) {
-      res.setHeader('content-type', 'text/html');
-      res.sendStatus(204);
-    } else {
-      res.setHeader('content-type', 'application/json');
-      res.status(200).json(suggestedUserLogins);
-    }
+    usersService.autoSuggestUsers(substring, limit)
+      .then((result) => {
+        if (!result.length) {
+          res.setHeader('content-type', 'text/html');
+          res.sendStatus(204);
+        } else {
+          res.setHeader('content-type', 'application/json');
+          console.log(result)
+          res.status(200).json(result);
+        }
+      })
+      .catch((err) => res.status(err.status).send(err.message));
   }
 }
 

@@ -28,6 +28,8 @@
     "@types/hapi__joi": "^17.1.4",
     "@types/node": "^14.0.26",
     "@types/uuid": "^8.3.0",
+    "@types/sequelize": "^4.28.9",
+    "@types/validator": "^13.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
@@ -39,6 +41,8 @@
     "express": "^4.17.1",
     "express-joi-validation": "^4.0.4-beta.0",
     "joi-extract-type": "^15.0.8",
+    "pg": "^8.3.3",
+    "sequelize": "^6.3.5",
     "uuid": "^8.3.0"
   }
 }

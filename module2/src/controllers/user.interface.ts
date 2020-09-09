@@ -1,4 +1,4 @@
-interface User {
+interface UserInterface {
   id?: string;
   login?: string;
   password?: string;
@@ -6,4 +6,4 @@ interface User {
   isDeleted?: boolean;
 }
 
-export default User;
+export default UserInterface;
