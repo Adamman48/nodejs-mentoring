@@ -117,7 +117,6 @@ class UsersController extends Controller {
           res.sendStatus(204);
         } else {
           res.setHeader('content-type', 'application/json');
-          console.log(result)
           res.status(200).json(result);
         }
       })
