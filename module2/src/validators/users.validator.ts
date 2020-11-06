@@ -1,16 +1,6 @@
 import * as Joi from '@hapi/joi';
-import { ValidatedRequestSchema, createValidator, ExpressJoiInstance, ContainerTypes } from 'express-joi-validation';
+import { ValidatedRequestSchema, ContainerTypes } from 'express-joi-validation';
 import 'joi-extract-type';
-
-export const usersValidator: ExpressJoiInstance = createValidator({ passError: true });
-
-export const headersSchema: Joi.ObjectSchema = Joi.object({
-  ['content-type']: Joi.equal('application/json').required(),
-});
-
-export const idParamSchema: Joi.ObjectSchema = Joi.object({
-  id: Joi.string().required(),
-});
 
 export const substringParamSchema: Joi.ObjectSchema = Joi.object({
   substr: Joi.string().required(),
@@ -20,7 +10,7 @@ export const limitQuerySchema: Joi.ObjectSchema = Joi.object({
   limit: Joi.number().integer().max(5).required(),
 });
 
-export const bodySchema: Joi.ObjectSchema = Joi.object({
+export const userBodySchema: Joi.ObjectSchema = Joi.object({
   login: Joi.string().trim(false).min(1).max(25),
   password: Joi.string().pattern(
     new RegExp('^(?=.*[0-9]{1,})(?=.*[a-zA-Z]{1,})([a-zA-Z0-9]+)$'),
@@ -29,7 +19,7 @@ export const bodySchema: Joi.ObjectSchema = Joi.object({
   age: Joi.number().integer().max(130).min(4).required(),
 });
 
-export interface UserRequestSchema extends ValidatedRequestSchema {
+export interface UsersRequestSchema extends ValidatedRequestSchema {
   [ContainerTypes.Params]: {
     id: string,
     substr: string,
@@ -39,4 +29,4 @@ export interface UserRequestSchema extends ValidatedRequestSchema {
     password: string,
     age: number,
   },
-};
+}

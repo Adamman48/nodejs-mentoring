@@ -1,7 +1,7 @@
-import UserInterface from "../controllers/user.interface";
 import { v4 as uuidv4 } from 'uuid';
 import User from "../models/User.model";
 import { Op } from "sequelize";
+import UserInterface from '../definitions/user.interface';
 
 class UsersService {
   constructor() {}
@@ -45,4 +45,4 @@ class UsersService {
   }
 }
 
-export default new UsersService();
+export default new UsersService() as UsersService;

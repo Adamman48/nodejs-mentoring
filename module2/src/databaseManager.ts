@@ -5,7 +5,7 @@ interface DatabaseInterface {
   [key: string]: Sequelize;
 }
 
-const defaultDB = new Sequelize('lrevvzdj', 'lrevvzdj', 'Wq7wgCijm89IeVuu5_pZVndL6L9me6qW', {
+export const defaultDB = new Sequelize('lrevvzdj', 'lrevvzdj', 'Wq7wgCijm89IeVuu5_pZVndL6L9me6qW', {
   host: 'balarama.db.elephantsql.com',
   port: 5432,
   dialect: 'postgres',
@@ -14,7 +14,7 @@ const defaultDB = new Sequelize('lrevvzdj', 'lrevvzdj', 'Wq7wgCijm89IeVuu5_pZVnd
     min: 0,
     idle: 10000,
   },
-  logging: false,
+  logging: true,
 });
 
 class DatabaseManager {
@@ -28,6 +28,12 @@ class DatabaseManager {
     Object.values(DatabaseManager.databases).forEach((database) => {
       database.authenticate()
       .then(() => {
+        database.sync({
+          force: true,
+          hooks: true,
+          logging: true,
+          schema: 'public',
+        })
         console.log(ConsoleColorsEnum.MAGENTA, 'Successfully connected to remote DB!');
       })
       .catch((err) => {
@@ -37,10 +43,7 @@ class DatabaseManager {
   }
 }
 
-DatabaseManager.addDatabases({
-  defaultDB,
-});
+DatabaseManager.addDatabases({ defaultDB });
 DatabaseManager.connectToDatabases();
-
 
 export default DatabaseManager;

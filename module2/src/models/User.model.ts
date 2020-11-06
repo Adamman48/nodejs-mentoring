@@ -1,9 +1,18 @@
-import { DataTypes, Model } from 'sequelize';
+import { Association, DataTypes, Model } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import DatabaseManager from '../databaseManager';
 import usersService from '../services/users.service';
+import Group from './Group.model';
+import UserGroup from './UserGroup.model';
 
-class User extends Model {};
+class User extends Model {
+  public readonly groups?: Group[];
+
+  public static associations: {
+    groups: Association<User, Group>;
+    userGroup: Association<User, UserGroup>;
+  }
+};
 
 User.init({
   id: {
@@ -51,7 +60,5 @@ User.init({
     }
   }
 });
-
-User.sync({ force:true });
 
 export default User;

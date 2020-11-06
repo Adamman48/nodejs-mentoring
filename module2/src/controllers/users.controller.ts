@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import { Controller } from '../definitions/controller.abstract';
 import HttpException from '../exceptions/HttpException';
 import { ValidatedRequest } from 'express-joi-validation';
-import { usersValidator, headersSchema, idParamSchema, UserRequestSchema, bodySchema, substringParamSchema, limitQuerySchema } from '../validators/users.validator';
-import usersService from '../services/users.service';
+import { UsersRequestSchema, userBodySchema, limitQuerySchema, substringParamSchema } from '../validators/users.validator';
+import UsersService from '../services/users.service';
+import { coreValidator, headersSchema, idParamSchema } from '../validators/core.validator';
+import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from '../definitions/constants';
 
 class UsersController extends Controller {
   constructor() {
@@ -11,40 +13,41 @@ class UsersController extends Controller {
   }
 
   initRoutes() {
-    this.router.get(this.path, this.getAllUsers.bind(this));
-    this.router.get(
-      `${this.path}/:id`,
-      usersValidator.params(idParamSchema),
+    const { router, path } = this;
+    router.get(path, this.getAllUsers.bind(this));
+    router.get(
+      `${path}/:id`,
+      coreValidator.params(idParamSchema),
       this.getUserById.bind(this)
     );
-    this.router.post(
-      this.path,
-      usersValidator.headers(headersSchema),
-      usersValidator.body(bodySchema),
+    router.post(
+      path,
+      coreValidator.headers(headersSchema),
+      coreValidator.body(userBodySchema),
       this.addUser.bind(this)
     );
-    this.router.put(
-      `${this.path}/:id`,
-      usersValidator.headers(headersSchema),
-      usersValidator.params(idParamSchema),
-      usersValidator.body(bodySchema),
+    router.put(
+      `${path}/:id`,
+      coreValidator.headers(headersSchema),
+      coreValidator.params(idParamSchema),
+      coreValidator.body(userBodySchema),
       this.updateUser.bind(this)
     );
-    this.router.delete(
-      `${this.path}/:id`,
-      usersValidator.params(idParamSchema),
+    router.delete(
+      `${path}/:id`,
+      coreValidator.params(idParamSchema),
       this.softDeleteUser.bind(this)
     );
-    this.router.get(
-      `${this.path}/suggest/:substr`,
-      usersValidator.params(substringParamSchema),
-      usersValidator.query(limitQuerySchema),
+    router.get(
+      `${path}/suggest/:substr`,
+      coreValidator.params(substringParamSchema),
+      coreValidator.query(limitQuerySchema),
       this.getAutoSuggestUsers.bind(this)
     )
   }
 
   getAllUsers(req: Request, res: Response): void {
-    usersService.findAll()
+    UsersService.findAll()
       .then((result) => {
         if (!result) {
           throw new HttpException(404, 'No user found!');
@@ -55,68 +58,66 @@ class UsersController extends Controller {
       .catch((err) => res.status(err.status).send(err.message));
   }
 
-  getUserById(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
+  getUserById(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    usersService.findOneById(userId)
+    UsersService.findOneById(userId)
       .then((result) => {
         if (!result) {
           throw new HttpException(404, 'User not found!');
         } else {
-          res.setHeader('content-type', 'application/json');
+          res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
           res.status(200).json(result);
         }
       })
-      .catch((err) => {
-        res.status(err.status).send(err.message);
-      });
+      .catch((err) => res.status(err.status).send(err.message));
   }
 
-  addUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
-    usersService.addOne(req.body)
+  addUser(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
+    UsersService.addOne(req.body)
       .then((result) => {
-        res.setHeader('content-type', 'application/json');
+        res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
         res.status(200).json(result);
       })
       .catch((err) => res.status(418).send(err));
   }
 
-  updateUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
+  updateUser(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    usersService.updateOne(userId, req.body)
+    UsersService.updateOne(userId, req.body)
       .then((result) => {
         if(!result[0]) {
           throw new HttpException(404, 'User not found!');
         }
-        res.setHeader('content-type', 'application/json');
+        res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
         res.status(200).json(result[1]);
       })
       .catch((err) => res.status(err.status).send(err.message));
   }
 
-  softDeleteUser(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
+  softDeleteUser(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    usersService.updateOne(userId, { isDeleted: true })
+    UsersService.updateOne(userId, { isDeleted: true })
       .then((result) => {
         if(!result[0]) {
           throw new HttpException(404, 'User not found!');
         }
-        res.setHeader('content-type', 'application/json');
+        res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
         res.status(200).json(result[1]);
       })
       .catch((err) => res.status(err.status).send(err.message));
   }
 
-  getAutoSuggestUsers(req: ValidatedRequest<UserRequestSchema>, res: Response): void {
+  getAutoSuggestUsers(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
     const substring: string = req.params.substr;
     const limit: number = req.query.limit;
 
-    usersService.autoSuggestUsers(substring, limit)
+    UsersService.autoSuggestUsers(substring, limit)
       .then((result) => {
         if (!result.length) {
-          res.setHeader('content-type', 'text/html');
+          res.setHeader(CONTENT_TYPE, 'text/html');
           res.sendStatus(204);
         } else {
-          res.setHeader('content-type', 'application/json');
+          res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
           res.status(200).json(result);
         }
       })
@@ -124,4 +125,4 @@ class UsersController extends Controller {
   }
 }
 
-export default UsersController;
+export default  new UsersController() as UsersController;
