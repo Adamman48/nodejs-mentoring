@@ -6,6 +6,7 @@ import { UsersRequestSchema, userBodySchema, limitQuerySchema, substringParamSch
 import UsersService from '../services/users.service';
 import { coreValidator, headersSchema, idParamSchema } from '../validators/core.validator';
 import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from '../definitions/constants';
+import UserGroupService from '../services/userGroup.service';
 
 class UsersController extends Controller {
   constructor() {
@@ -96,15 +97,24 @@ class UsersController extends Controller {
 
   softDeleteUser(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
     const userId: string = req.params.id;
-    UsersService.updateOne(userId, { isDeleted: true })
-      .then((result) => {
-        if(!result[0]) {
+    Promise.all(([
+      UsersService.updateOne(userId, { isDeleted: true }),
+      UserGroupService.removeAllById(userId, true),
+    ]))
+      .then(([
+        [updatedUserCount, updatedUserEntity],
+        userGroupRemovalCount
+      ]) => {
+        if (!updatedUserCount) {
           throw new HttpException(404, 'User not found!');
         }
         res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
-        res.status(200).json(result[1]);
+        res.status(200).json({
+          updatedUserEntity,
+          userGroupRemovalCount,
+        });
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => res.status(err.status || 404).send(err.message || err));
   }
 
   getAutoSuggestUsers(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {

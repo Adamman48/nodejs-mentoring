@@ -4,6 +4,7 @@ import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from "../definitions/constants";
 import { Controller } from "../definitions/controller.abstract";
 import HttpException from "../exceptions/HttpException";
 import GroupsService from "../services/groups.service";
+import UserGroupService from "../services/userGroup.service";
 import { coreValidator, headersSchema, idParamSchema } from "../validators/core.validator";
 import { groupBodySchema, GroupsRequestSchema } from "../validators/groups.validator";
 
@@ -90,15 +91,21 @@ class GroupsController extends Controller {
 
   removeGroup(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
     const groupId = req.params.id;
-    GroupsService.removeOne(groupId)
-      .then((result) => {
-        if (!result) {
+    Promise.all([
+      GroupsService.removeOne(groupId),
+      UserGroupService.removeAllById(groupId, false)
+    ])
+      .then(([groupRemovalCount, userGroupRemovalCount]) => {
+        if (!groupRemovalCount) {
           throw new HttpException(404, 'Group not found!');
         }
         res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
-        res.status(200).json(result);
+        res.status(200).json({
+          groupRemovalCount,
+          userGroupRemovalCount
+        });
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => res.status(err.status || 404).send(err.message || err));
   }
 }
 

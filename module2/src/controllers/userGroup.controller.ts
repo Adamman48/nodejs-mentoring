@@ -27,7 +27,6 @@ class UserGroupController extends Controller {
 
     UserGroupService.addUsersToGroup(userIdList, groupId)
       .then((result) => {
-        console.log(result)
         res.status(200).send('Users added to group!');
       })
       .catch((err) => res.status(404).send(err));
