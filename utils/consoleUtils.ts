@@ -16,3 +16,10 @@ export function handleErrorCb(err: Error | null): void {
     console.log(ConsoleColorsEnum.MAGENTA, 'Operation succeeded.');
   }
 }
+
+export function controllerErrorLogger(methodName: string, argumentList: any[], err: Error) {
+  const formattedArgList = argumentList.map((arg, i) => `arg${i + 1}: ${arg},`);
+  const logMessage = `Error calling ${methodName} method with (${formattedArgList})\n${err}`;
+
+  console.error(ConsoleColorsEnum.RED, logMessage);
+}

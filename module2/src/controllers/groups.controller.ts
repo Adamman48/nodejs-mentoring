@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ValidatedRequest } from "express-joi-validation";
+import { controllerErrorLogger } from "../../../utils/consoleUtils";
 import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from "../definitions/constants";
 import { Controller } from "../definitions/controller.abstract";
 import HttpException from "../exceptions/HttpException";
@@ -50,7 +51,10 @@ class GroupsController extends Controller {
           res.status(200).json(result);
         }
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+        controllerErrorLogger(GroupsService.findAll.name, [], err);
+      });
   }
 
   getGroupById(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
@@ -64,7 +68,10 @@ class GroupsController extends Controller {
           res.status(200).json(result);
         }
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+        controllerErrorLogger(GroupsService.findOneById.name, [groupId], err);
+      });
   }
 
   createGroup(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
@@ -73,7 +80,10 @@ class GroupsController extends Controller {
         res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
         res.status(200).json(result);
       })
-      .catch((err) => res.status(418).send(err));
+      .catch((err) => {
+        res.status(418).send(err);
+        controllerErrorLogger(GroupsService.createOne.name, [req.body], err);
+      });
   }
 
   updateGroup(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
@@ -86,7 +96,10 @@ class GroupsController extends Controller {
         res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
         res.status(200).json(result[1]);
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+        controllerErrorLogger(GroupsService.updateOne.name, [groupId, req.body], err);
+      });
   }
 
   removeGroup(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
@@ -105,7 +118,11 @@ class GroupsController extends Controller {
           userGroupRemovalCount
         });
       })
-      .catch((err) => res.status(err.status || 404).send(err.message || err));
+      .catch((err) => {
+        res.status(err.status || 404).send(err.message || err);
+        controllerErrorLogger(GroupsService.removeOne.name, [groupId], err);
+        controllerErrorLogger(UserGroupService.removeAllById.name, [groupId, false], err);
+      });
   }
 }
 

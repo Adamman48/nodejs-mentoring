@@ -1,6 +1,8 @@
 import express from 'express';
+import morgan from 'morgan';
 import { ConsoleColorsEnum } from '../../utils/consoleUtils';
 import { Controller } from './definitions/controller.abstract';
+import endpointLoggingMiddleware from './middlewares/endpointLogging.middleware';
 import errorMiddleware from './middlewares/error.middleware';
 import validationErrorMiddleware from './middlewares/validationError.middleware';
 
@@ -12,6 +14,7 @@ class App {
     this.app = express();
     this.port = port;
 
+    this.initLogging();
     this.initMiddlewares();
     this.initControllers(controllers);
     this.initErrorMiddlewares();
@@ -30,6 +33,25 @@ class App {
   private initErrorMiddlewares() {
     this.app.use(validationErrorMiddleware);
     this.app.use(errorMiddleware);
+  }
+
+  private initLogging() {
+    this.app.use(
+      morgan('combined', {
+        skip: (req, res) => {
+          return res.statusCode < 400;
+        },
+      })
+    );
+    process.on('uncaughtException', (err: Error, origin: string) => {
+      const logMessage = `Caught following exception at ${origin}:\n${err}`;
+      console.error(ConsoleColorsEnum.RED, logMessage);
+    });
+    process.on('unhandledRejection', (reason: {} | null | undefined, promise: Promise<void>) => {
+      const logMessage = `Unhandled rejection at ${promise}\n${reason}`;
+      console.error(ConsoleColorsEnum.RED, logMessage);
+    });
+    this.app.use(endpointLoggingMiddleware);
   }
 
   public listen(): void {

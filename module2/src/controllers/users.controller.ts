@@ -7,6 +7,7 @@ import UsersService from '../services/users.service';
 import { coreValidator, headersSchema, idParamSchema } from '../validators/core.validator';
 import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from '../definitions/constants';
 import UserGroupService from '../services/userGroup.service';
+import { controllerErrorLogger } from '../../../utils/consoleUtils';
 
 class UsersController extends Controller {
   constructor() {
@@ -56,7 +57,10 @@ class UsersController extends Controller {
           res.status(200).json(result);
         }
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+        controllerErrorLogger(UsersService.findAll.name, [], err);
+      });
   }
 
   getUserById(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
@@ -70,7 +74,10 @@ class UsersController extends Controller {
           res.status(200).json(result);
         }
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+        controllerErrorLogger(UsersService.findOneById.name, [userId], err);
+      });
   }
 
   addUser(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
@@ -79,7 +86,10 @@ class UsersController extends Controller {
         res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
         res.status(200).json(result);
       })
-      .catch((err) => res.status(418).send(err));
+      .catch((err) => {
+        res.status(418).send(err);
+        controllerErrorLogger(UsersService.addOne.name, [req.body], err);
+      });
   }
 
   updateUser(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
@@ -92,7 +102,10 @@ class UsersController extends Controller {
         res.setHeader(CONTENT_TYPE, CONTENT_TYPE_APP_JSON);
         res.status(200).json(result[1]);
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+        controllerErrorLogger(UsersService.updateOne.name, [userId, req.body], err);
+      });
   }
 
   softDeleteUser(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
@@ -114,7 +127,11 @@ class UsersController extends Controller {
           userGroupRemovalCount,
         });
       })
-      .catch((err) => res.status(err.status || 404).send(err.message || err));
+      .catch((err) => {
+        res.status(err.status || 404).send(err.message || err);
+        controllerErrorLogger(UsersService.updateOne.name, [userId, { isDeleted: true }], err);
+        controllerErrorLogger(UserGroupService.removeAllById.name, [userId, true], err);
+      });
   }
 
   getAutoSuggestUsers(req: ValidatedRequest<UsersRequestSchema>, res: Response): void {
@@ -131,7 +148,10 @@ class UsersController extends Controller {
           res.status(200).json(result);
         }
       })
-      .catch((err) => res.status(err.status).send(err.message));
+      .catch((err) => {
+        res.status(err.status).send(err.message);
+        controllerErrorLogger(UsersService.autoSuggestUsers.name, [substring, limit], err);
+      });
   }
 }
 

@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { ValidatedRequest } from "express-joi-validation";
+import { controllerErrorLogger } from "../../../utils/consoleUtils";
 import { Controller } from "../definitions/controller.abstract";
 import UserGroupService from "../services/userGroup.service";
 import { coreValidator, idParamSchema, headersSchema } from "../validators/core.validator";
@@ -29,7 +30,10 @@ class UserGroupController extends Controller {
       .then((result) => {
         res.status(200).send('Users added to group!');
       })
-      .catch((err) => res.status(404).send(err));
+      .catch((err) => {
+        res.status(404).send(err);
+        controllerErrorLogger(UserGroupService.addUsersToGroup.name, [userIdList, groupId], err);
+      });
   }
 }
 
