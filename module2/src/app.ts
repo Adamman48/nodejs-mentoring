@@ -1,10 +1,12 @@
 import express from 'express';
 import morgan from 'morgan';
+import cors from 'cors';
 import { ConsoleColorsEnum } from '../../utils/consoleUtils';
 import { Controller } from './definitions/controller.abstract';
 import endpointLoggingMiddleware from './middlewares/endpointLogging.middleware';
 import errorMiddleware from './middlewares/error.middleware';
 import validationErrorMiddleware from './middlewares/validationError.middleware';
+import cookieParser from 'cookie-parser';
 
 class App {
   public app: express.Application;
@@ -22,6 +24,8 @@ class App {
 
   private initMiddlewares(): void {
     this.app.use(express.json());
+    this.app.use(cookieParser());
+    this.app.use(cors());
   }
 
   private initControllers(controllers: Controller[]): void {
@@ -36,6 +40,7 @@ class App {
   }
 
   private initLogging() {
+    this.app.use(endpointLoggingMiddleware);
     this.app.use(
       morgan('combined', {
         skip: (req, res) => {
@@ -51,7 +56,6 @@ class App {
       const logMessage = `Unhandled rejection at ${promise}\n${reason}`;
       console.error(ConsoleColorsEnum.RED, logMessage);
     });
-    this.app.use(endpointLoggingMiddleware);
   }
 
   public listen(): void {

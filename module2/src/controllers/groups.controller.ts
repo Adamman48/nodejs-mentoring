@@ -4,6 +4,7 @@ import { controllerErrorLogger } from "../../../utils/consoleUtils";
 import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from "../definitions/constants";
 import { Controller } from "../definitions/controller.abstract";
 import HttpException from "../exceptions/HttpException";
+import authMiddleware from "../middlewares/auth.middleware";
 import GroupsService from "../services/groups.service";
 import UserGroupService from "../services/userGroup.service";
 import { coreValidator, headersSchema, idParamSchema } from "../validators/core.validator";
@@ -16,6 +17,7 @@ class GroupsController extends Controller {
 
   initRoutes() {
     const { router, path } = this;
+    router.use(path, authMiddleware);
     router.get(path, this.getAllGroups.bind(this));
     router.get(
       `${path}/:id`,

@@ -8,6 +8,7 @@ import { coreValidator, headersSchema, idParamSchema } from '../validators/core.
 import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from '../definitions/constants';
 import UserGroupService from '../services/userGroup.service';
 import { controllerErrorLogger } from '../../../utils/consoleUtils';
+import authMiddleware from '../middlewares/auth.middleware';
 
 class UsersController extends Controller {
   constructor() {
@@ -16,6 +17,7 @@ class UsersController extends Controller {
 
   initRoutes() {
     const { router, path } = this;
+    router.use(path, authMiddleware);
     router.get(path, this.getAllUsers.bind(this));
     router.get(
       `${path}/:id`,

@@ -2,6 +2,7 @@ import { Response } from "express";
 import { ValidatedRequest } from "express-joi-validation";
 import { controllerErrorLogger } from "../../../utils/consoleUtils";
 import { Controller } from "../definitions/controller.abstract";
+import authMiddleware from "../middlewares/auth.middleware";
 import UserGroupService from "../services/userGroup.service";
 import { coreValidator, idParamSchema, headersSchema } from "../validators/core.validator";
 import { userGroupBodySchema, UserGroupRequestSchema } from "../validators/userGroup.validator";
@@ -13,6 +14,7 @@ class UserGroupController extends Controller {
 
   initRoutes() {
     const { router, path } = this;
+    router.use(path, authMiddleware);
     router.put(
       `${path}/:id`,
       coreValidator.headers(headersSchema),
