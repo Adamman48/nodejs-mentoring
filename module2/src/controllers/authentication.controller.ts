@@ -6,44 +6,6 @@ import { TokenDataInterface } from "../definitions/token.interface";
 import HttpException from "../exceptions/HttpException";
 import AuthService from "../services/auth.service";
 
-/**
- * @swagger
- *
- * components:
- *  requestBodies:
- *     loginBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               login:
- *                 type: string
- *               password:
- *                 type: string
- *  responses:
- *     successLogin:
- *        description: >
- *          Successfully authenticated.
- *          The session ID is returned in a cookie named `Authorization`. You need to include this cookie in subsequent requests.
- *        headers:
- *          Set-Cookie:
- *            schema:
- *              type: string
- *              example: Authorization=acde1234; HttpOnly; Max-Age=3600
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
- *  securitySchemes:
- *     cookieAuth:
- *       in: cookie
- *       type: apiKey
- *       name: Authorization
- * security:
- *   - cookieAuth []
- */
-
 class AuthController extends Controller {
   constructor() {
     super('/auth');
@@ -101,3 +63,41 @@ class AuthController extends Controller {
 }
 
 export default new AuthController() as AuthController;
+
+/**
+ * @swagger
+ *
+ * components:
+ *  requestBodies:
+ *     loginBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               login:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *  responses:
+ *     successLogin:
+ *        description: >
+ *          Successfully authenticated.
+ *          The session ID is returned in a cookie named `Authorization`. You need to include this cookie in subsequent requests.
+ *        headers:
+ *          Set-Cookie:
+ *            schema:
+ *              type: string
+ *              example: Authorization=acde1234; HttpOnly; Max-Age=3600
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *  securitySchemes:
+ *     cookieAuth:
+ *       in: cookie
+ *       type: apiKey
+ *       name: Authorization
+ * security:
+ *   - cookieAuth []
+ */

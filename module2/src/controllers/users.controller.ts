@@ -90,7 +90,7 @@ class UsersController extends Controller {
  *     produces:
  *       - application/json
  *     parameters:
- *       - $ref: '#/components/parameters/userIdParam'
+ *       - $ref: '#/components/parameters/idParam'
  *     responses:
  *       200:
  *        $ref: '#/components/responses/successUser'
@@ -155,7 +155,7 @@ class UsersController extends Controller {
  *     produces:
  *       - application/json
  *     parameters:
- *       - $ref: '#/components/parameters/userIdParam'
+ *       - $ref: '#/components/parameters/idParam'
  *     requestBody:
  *       $ref: '#/components/requestBodies/userBody'
  *     responses:
@@ -189,7 +189,7 @@ class UsersController extends Controller {
  *     produces:
  *       - application/json
  *     parameters:
- *       - $ref: '#/components/parameters/userIdParam'
+ *       - $ref: '#/components/parameters/idParam'
  *     responses:
  *       200:
  *        $ref: '#/components/responses/deleteUser'
@@ -286,13 +286,6 @@ export default  new UsersController() as UsersController;
  *               age:
  *                 type: number
  *  parameters:
- *     userIdParam:
- *       in: path
- *       name: userId
- *       description: Internal User id
- *       required: true
- *       schema:
- *         type: string
  *     substring:
  *       in: path
  *       name: substr

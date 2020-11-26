@@ -36,7 +36,7 @@ const swaggerOptions = {
       'http'
     ]
   },
-  apis: ['./module2/src/controllers/*', './module2/src/models/*'],
+  apis: ['./module2/src/controllers/*', './module2/src/models/*', './module2/src/validators/*'],
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);

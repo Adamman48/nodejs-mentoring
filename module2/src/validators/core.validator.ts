@@ -3,6 +3,20 @@ import { createValidator, ExpressJoiInstance } from 'express-joi-validation';
 import 'joi-extract-type';
 import { CONTENT_TYPE, CONTENT_TYPE_APP_JSON } from '../definitions/constants';
 
+/**
+ * @swagger
+ *
+ * components:
+ *  parameters:
+ *     idParam:
+ *       in: path
+ *       name: id
+ *       description: Internal id
+ *       required: true
+ *       schema:
+ *         type: string
+ */
+
 export const coreValidator: ExpressJoiInstance = createValidator({ passError: true });
 
 export const headersSchema: Joi.ObjectSchema = Joi.object({

@@ -84,7 +84,7 @@ class GroupsController extends Controller {
  *     produces:
  *       - application/json
  *     parameters:
- *       - $ref: '#/components/parameters/groupIdParam'
+ *       - $ref: '#/components/parameters/idParam'
  *     responses:
  *       200:
  *        $ref: '#/components/responses/successGroup'
@@ -149,7 +149,7 @@ class GroupsController extends Controller {
  *     produces:
  *       - application/json
  *     parameters:
- *       - $ref: '#/components/parameters/groupIdParam'
+ *       - $ref: '#/components/parameters/idParam'
  *     requestBody:
  *       $ref: '#/components/requestBodies/groupBody'
  *     responses:
@@ -183,7 +183,7 @@ class GroupsController extends Controller {
  *     produces:
  *       - application/json
  *     parameters:
- *       - $ref: '#/components/parameters/groupIdParam'
+ *       - $ref: '#/components/parameters/idParam'
  *     responses:
  *       200:
  *        $ref: '#/components/responses/deleteGroup'
@@ -227,14 +227,6 @@ export default new GroupsController() as GroupsController;
  *             properties:
  *               name:
  *                 type: string
- *  parameters:
- *     groupIdParam:
- *       in: path
- *       name: groupId
- *       description: Internal Group id
- *       required: true
- *       schema:
- *         type: string
  *  responses:
  *     listGroup:
  *       content:
