@@ -44,6 +44,20 @@ class GroupsController extends Controller {
     );
   }
 
+/**
+ * @swagger
+ *
+ * /groups:
+ *   get:
+ *     tags: 
+ *       - "groups-controller"
+ *     description: Get all groups
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         $ref: '#components/responses/listGroup'
+ */
   getAllGroups(req: Request, res: Response): void {
     GroupsService.findAll()
       .then((result) => {
@@ -59,6 +73,22 @@ class GroupsController extends Controller {
       });
   }
 
+/**
+ * @swagger
+ *
+ * /groups/{groupId}:
+ *   get:
+ *     tags:
+ *       - "groups-controller"
+ *     description: "Get a group by id"
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - $ref: '#/components/parameters/groupIdParam'
+ *     responses:
+ *       200:
+ *        $ref: '#/components/responses/successGroup'
+ */
   getGroupById(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
     const groupId: string = req.params.id;
     GroupsService.findOneById(groupId)
@@ -76,6 +106,24 @@ class GroupsController extends Controller {
       });
   }
 
+/**
+ * @swagger
+ *
+ * /groups:
+ *   post:
+ *     tags:
+ *       - "groups-controller"
+ *     description: "Create a group"
+ *     consumes:
+ *       - application/json
+ *     produces:
+ *       - application/json
+ *     requestBody:
+ *       $ref: '#/components/requestBodies/groupBody'
+ *     responses:
+ *       200:
+ *        $ref: '#/components/responses/successGroup'
+ */
   createGroup(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
     GroupsService.createOne(req.body)
       .then((result) => {
@@ -88,6 +136,26 @@ class GroupsController extends Controller {
       });
   }
 
+/**
+ * @swagger
+ *
+ * /groups/{groupId}:
+ *   put:
+ *     tags:
+ *       - "groups-controller"
+ *     description: "Update a group"
+ *     consumes:
+ *       - application/json
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - $ref: '#/components/parameters/groupIdParam'
+ *     requestBody:
+ *       $ref: '#/components/requestBodies/groupBody'
+ *     responses:
+ *       200:
+ *        $ref: '#/components/responses/listGroup'
+ */
   updateGroup(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
     const groupId = req.params.id;
     GroupsService.updateOne(groupId, req.body)
@@ -104,6 +172,22 @@ class GroupsController extends Controller {
       });
   }
 
+/**
+ * @swagger
+ *
+ * /groups/{groupId}:
+ *   delete:
+ *     tags:
+ *       - "groups-controller"
+ *     description: "Delete a group"
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - $ref: '#/components/parameters/groupIdParam'
+ *     responses:
+ *       200:
+ *        $ref: '#/components/responses/deleteGroup'
+ */
   removeGroup(req: ValidatedRequest<GroupsRequestSchema>, res: Response): void {
     const groupId = req.params.id;
     Promise.all([
@@ -129,3 +213,49 @@ class GroupsController extends Controller {
 }
 
 export default new GroupsController() as GroupsController;
+
+/**
+ * @swagger
+ *
+ * components:
+ *  requestBodies:
+ *     groupBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *  parameters:
+ *     groupIdParam:
+ *       in: path
+ *       name: groupId
+ *       description: Internal Group id
+ *       required: true
+ *       schema:
+ *         type: string
+ *  responses:
+ *     listGroup:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/Group'
+ *     successGroup:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Group'
+ *     deleteGroup:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               groupRemovalCount:
+ *                 type: number
+ *               userGroupRemovalCount:
+ *                 type: number
+ */

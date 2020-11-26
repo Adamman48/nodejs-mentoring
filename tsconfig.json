@@ -13,7 +13,8 @@
     "emitDecoratorMetadata": true,
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "typeRoots": ["node_modules/@types", "node_modules/csvtojson/v2"]
+    "typeRoots": ["node_modules/@types", "node_modules/csvtojson/v2"],
+    "resolveJsonModule": true
   },
   "include": ["./**/*.ts"],
   "exclude": ["node_modules"]

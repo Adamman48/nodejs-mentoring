@@ -5,6 +5,27 @@ import groupsService from '../services/groups.service';
 import User from './User.model';
 import UserGroup from './UserGroup.model';
 
+/**
+ * @swagger
+ *
+ * components:
+ *  schemas:
+ *     Group:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         permissions:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [READ, WRITE, DELETE, SHARE, UPLOAD_FILES]
+ *           default: [READ]
+ *       xml:
+ *         name: "Group"
+ */
 class Group extends Model {
   public addUsers!: HasManyAddAssociationsMixin<User, string>;
 

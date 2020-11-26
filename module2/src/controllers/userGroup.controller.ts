@@ -24,6 +24,30 @@ class UserGroupController extends Controller {
     );
   }
 
+/**
+ * @swagger
+ *
+ * /groups/add/{groupId}:
+ *   put:
+ *     tags:
+ *       - "groupUsers-controller"
+ *     description: "Add n number of users to a group"
+ *     consumes:
+ *       - application/json
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - $ref: '#/components/parameters/groupIdParam'
+ *     requestBody:
+ *       $ref: '#/components/requestBodies/groupBody'
+ *     responses:
+ *       200:
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Users added to group!
+ */
   addUsersToGroup(req: ValidatedRequest<UserGroupRequestSchema>, res: Response): void {
     const groupId: string = req.params.id;
     const { userIdList }: { userIdList: string[] } = req.body;

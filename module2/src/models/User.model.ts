@@ -5,6 +5,28 @@ import usersService from '../services/users.service';
 import Group from './Group.model';
 import UserGroup from './UserGroup.model';
 
+/**
+ * @swagger
+ *
+ * components:
+ *  schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         login:
+ *           type: string
+ *         password:
+ *           type: string
+ *         age:
+ *           type: number
+ *         isDeleted:
+ *           type: boolean
+ *           default: false
+ *       xml:
+ *         name: "User"
+ */
 class User extends Model {
   public readonly groups?: Group[];
 
