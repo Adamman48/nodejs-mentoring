@@ -50,7 +50,7 @@
     "express": "^4.17.1",
     "express-joi-validation": "^4.0.4-beta.0",
     "joi-extract-type": "^15.0.8",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
     "pg": "^8.3.3",
     "sequelize": "^6.3.5",
